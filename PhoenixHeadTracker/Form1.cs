@@ -121,6 +121,8 @@ namespace PhoenixHeadTracker
         // These constants are used to identify Windows messages and mouse events
         private const int WM_INPUT = 0x00FF;
         private const int MOUSEEVENTF_MOVE = 0x0001;
+        private const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+        private const int MOUSEEVENTF_LEFTUP = 0x0004;
 
         // These variables hold screen dimensions
         private int screenWidth = 1920;
@@ -184,6 +186,8 @@ namespace PhoenixHeadTracker
             input.inputUnion.mouseInput.dwExtraInfo = GetMessageExtraInfo(); // Set the extra information to 0
 
         }
+
+        bool isMouseDown = false;
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -328,34 +332,56 @@ namespace PhoenixHeadTracker
                         udpClient.Send(data, data.Length, endPoint);
                         // Close the udpClient to release any resources it's using
                     }
-                    
                 }
-
 
                 // Check if mouse tracking is enabled
                 if (isMouseTrack == true)
                 {
-                    // Apply a smoothing filter to the mouse input
-                    for (int q = 0; q < mouseSmoothFilter; q++)
+                    if (arr[0] > 20)
                     {
-                        // Set the mouse delta values to the filtered values
-                        input.inputUnion.mouseInput.dx = -(int)filteredDeltaX;
-                        input.inputUnion.mouseInput.dy = -(int)filteredDeltaY;
+                        isMouseDown = true;
+                        input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTDOWN;
 
-                        // Allocate memory for the INPUT structure
                         IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
-
-                        // Convert the INPUT structure to a pointer
                         Marshal.StructureToPtr(input, lParam, false);
-
-                        // Send the INPUT message to the specified window
-                        uint result = SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
-
-                        // Free the memory used by the INPUT structure
+                        SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
                         Marshal.FreeHGlobal(lParam);
-
-                        // Wait for a short amount of time before sending the next INPUT structure
                         System.Threading.Thread.Sleep(mouseDelayFilter);
+
+                    } else if (isMouseDown)
+                    {
+                        isMouseDown = false;
+                        input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTUP;
+
+                        IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
+                        Marshal.StructureToPtr(input, lParam, false);
+                        SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
+                        Marshal.FreeHGlobal(lParam);
+                        System.Threading.Thread.Sleep(mouseDelayFilter);
+
+                    } else {
+                        // Apply a smoothing filter to the mouse input
+                        for (int q = 0; q < mouseSmoothFilter; q++)
+                        {
+                            // Set the mouse delta values to the filtered values
+                            input.inputUnion.mouseInput.dx = -(int)filteredDeltaX;
+                            input.inputUnion.mouseInput.dy = -(int)filteredDeltaY;
+
+                            // Allocate memory for the INPUT structure
+                            IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
+
+                            // Convert the INPUT structure to a pointer
+                            Marshal.StructureToPtr(input, lParam, false);
+
+                            // Send the INPUT message to the specified window
+                            uint result = SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
+
+                            // Free the memory used by the INPUT structure
+                            Marshal.FreeHGlobal(lParam);
+
+                            // Wait for a short amount of time before sending the next INPUT structure
+                            System.Threading.Thread.Sleep(mouseDelayFilter);
+                        }
                     }
                 }
 
