@@ -123,6 +123,8 @@ namespace PhoenixHeadTracker
         private const int MOUSEEVENTF_MOVE = 0x0001;
         private const int MOUSEEVENTF_LEFTDOWN = 0x0002;
         private const int MOUSEEVENTF_LEFTUP = 0x0004;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        private const int MOUSEEVENTF_RIGHTUP = 0x0010;
 
         // These variables hold screen dimensions
         private int screenWidth = 1920;
@@ -187,7 +189,8 @@ namespace PhoenixHeadTracker
 
         }
 
-        bool isMouseDown = false;
+        bool isMouseLeftDown = false;
+        bool isMouseRightDown = false;
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -337,9 +340,9 @@ namespace PhoenixHeadTracker
                 // Check if mouse tracking is enabled
                 if (isMouseTrack == true)
                 {
-                    if (arr[0] > 20)
+                    if (arr[0] > 10.0f)
                     {
-                        isMouseDown = true;
+                        isMouseLeftDown = true;
                         input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTDOWN;
 
                         IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
@@ -348,9 +351,10 @@ namespace PhoenixHeadTracker
                         Marshal.FreeHGlobal(lParam);
                         System.Threading.Thread.Sleep(mouseDelayFilter);
 
-                    } else if (isMouseDown)
+                    }
+                    else if (isMouseLeftDown)
                     {
-                        isMouseDown = false;
+                        isMouseLeftDown = false;
                         input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTUP;
 
                         IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
@@ -359,7 +363,35 @@ namespace PhoenixHeadTracker
                         Marshal.FreeHGlobal(lParam);
                         System.Threading.Thread.Sleep(mouseDelayFilter);
 
-                    } else {
+                    }
+                    if (arr[0] < -10.0f)
+                    {
+                        isMouseRightDown = true;
+                        input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+
+                        IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
+                        Marshal.StructureToPtr(input, lParam, false);
+                        SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
+                        Marshal.FreeHGlobal(lParam);
+                        System.Threading.Thread.Sleep(mouseDelayFilter);
+
+                    }
+                    else if (isMouseRightDown)
+                    {
+                        isMouseRightDown = false;
+                        input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_RIGHTUP;
+
+                        IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
+                        Marshal.StructureToPtr(input, lParam, false);
+                        SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
+                        Marshal.FreeHGlobal(lParam);
+                        System.Threading.Thread.Sleep(mouseDelayFilter);
+
+                    }
+                    else
+                    {
+                        input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_MOVE;
+
                         // Apply a smoothing filter to the mouse input
                         for (int q = 0; q < mouseSmoothFilter; q++)
                         {

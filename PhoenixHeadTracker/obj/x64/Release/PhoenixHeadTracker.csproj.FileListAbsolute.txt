@@ -10,3 +10,15 @@ C:\Phoenix\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTrac
 C:\Phoenix\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.csproj.CoreCompileInputs.cache
 C:\Phoenix\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.exe
 C:\Phoenix\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.pdb
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\bin\x64\Release\PhoenixHeadTracker.exe.config
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\bin\x64\Release\PhoenixHeadTracker.exe
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\bin\x64\Release\PhoenixHeadTracker.pdb
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.csproj.AssemblyReference.cache
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.csproj.SuggestedBindingRedirects.cache
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.g.resources
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.Form1.resources
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.Properties.Resources.resources
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.csproj.GenerateResource.cache
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.csproj.CoreCompileInputs.cache
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.exe
+C:\Users\raulb\source\repos\PhoenixHeadTracker\PhoenixHeadTracker\obj\x64\Release\PhoenixHeadTracker.pdb
