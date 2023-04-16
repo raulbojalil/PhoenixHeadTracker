@@ -106,6 +106,9 @@
             this.textBoxPort = new System.Windows.Forms.TextBox();
             this.textBoxIPAddress = new System.Windows.Forms.TextBox();
             this.groupBoxMouseTrack = new System.Windows.Forms.GroupBox();
+            this.groupBoxGestureMode = new System.Windows.Forms.GroupBox();
+            this.buttonGestureModeOff = new System.Windows.Forms.Button();
+            this.buttonGestureModeOn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarYawSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarPitchSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarRollSpeed)).BeginInit();
@@ -120,6 +123,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBarMouseDelay)).BeginInit();
             this.groupBoxOpentrack.SuspendLayout();
             this.groupBoxMouseTrack.SuspendLayout();
+            this.groupBoxGestureMode.SuspendLayout();
             this.SuspendLayout();
             // 
             // button2
@@ -150,7 +154,7 @@
             // textBoxMouseLocation
             // 
             this.textBoxMouseLocation.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.textBoxMouseLocation.Location = new System.Drawing.Point(232, 579);
+            this.textBoxMouseLocation.Location = new System.Drawing.Point(230, 662);
             this.textBoxMouseLocation.Name = "textBoxMouseLocation";
             this.textBoxMouseLocation.ReadOnly = true;
             this.textBoxMouseLocation.Size = new System.Drawing.Size(221, 20);
@@ -159,7 +163,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(143, 584);
+            this.label4.Location = new System.Drawing.Point(141, 667);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(83, 13);
             this.label4.TabIndex = 9;
@@ -254,7 +258,7 @@
             // buttonMouseTrackOff
             // 
             this.buttonMouseTrackOff.Enabled = false;
-            this.buttonMouseTrackOff.Location = new System.Drawing.Point(7, 200);
+            this.buttonMouseTrackOff.Location = new System.Drawing.Point(9, 200);
             this.buttonMouseTrackOff.Name = "buttonMouseTrackOff";
             this.buttonMouseTrackOff.Size = new System.Drawing.Size(150, 32);
             this.buttonMouseTrackOff.TabIndex = 20;
@@ -265,7 +269,7 @@
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(726, 580);
+            this.linkLabel1.Location = new System.Drawing.Point(724, 663);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(108, 13);
             this.linkLabel1.TabIndex = 21;
@@ -769,7 +773,7 @@
             // linkLabel2
             // 
             this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Location = new System.Drawing.Point(586, 580);
+            this.linkLabel2.Location = new System.Drawing.Point(584, 663);
             this.linkLabel2.Name = "linkLabel2";
             this.linkLabel2.Size = new System.Drawing.Size(134, 13);
             this.linkLabel2.TabIndex = 43;
@@ -781,7 +785,7 @@
             // 
             this.linkLabel3.AutoSize = true;
             this.linkLabel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.linkLabel3.Location = new System.Drawing.Point(9, 582);
+            this.linkLabel3.Location = new System.Drawing.Point(7, 665);
             this.linkLabel3.Name = "linkLabel3";
             this.linkLabel3.Size = new System.Drawing.Size(103, 16);
             this.linkLabel3.TabIndex = 44;
@@ -850,7 +854,7 @@
             this.groupBoxOpentrack.Controls.Add(this.checkBoxYaw);
             this.groupBoxOpentrack.Controls.Add(this.checkBoxPitch);
             this.groupBoxOpentrack.Enabled = false;
-            this.groupBoxOpentrack.Location = new System.Drawing.Point(689, 82);
+            this.groupBoxOpentrack.Location = new System.Drawing.Point(689, 67);
             this.groupBoxOpentrack.Name = "groupBoxOpentrack";
             this.groupBoxOpentrack.Size = new System.Drawing.Size(168, 237);
             this.groupBoxOpentrack.TabIndex = 50;
@@ -948,16 +952,50 @@
             this.groupBoxMouseTrack.Controls.Add(this.trackBarMouseDelay);
             this.groupBoxMouseTrack.Controls.Add(this.labelMouseSmoothFilter);
             this.groupBoxMouseTrack.Enabled = false;
-            this.groupBoxMouseTrack.Location = new System.Drawing.Point(689, 325);
+            this.groupBoxMouseTrack.Location = new System.Drawing.Point(689, 310);
             this.groupBoxMouseTrack.Name = "groupBoxMouseTrack";
             this.groupBoxMouseTrack.Size = new System.Drawing.Size(168, 241);
             this.groupBoxMouseTrack.TabIndex = 51;
             this.groupBoxMouseTrack.TabStop = false;
             this.groupBoxMouseTrack.Text = "Mouse Track";
             // 
+            // groupBoxGestureMode
+            // 
+            this.groupBoxGestureMode.Controls.Add(this.buttonGestureModeOff);
+            this.groupBoxGestureMode.Controls.Add(this.buttonGestureModeOn);
+            this.groupBoxGestureMode.Enabled = false;
+            this.groupBoxGestureMode.Location = new System.Drawing.Point(689, 557);
+            this.groupBoxGestureMode.Name = "groupBoxGestureMode";
+            this.groupBoxGestureMode.Size = new System.Drawing.Size(168, 94);
+            this.groupBoxGestureMode.TabIndex = 52;
+            this.groupBoxGestureMode.TabStop = false;
+            this.groupBoxGestureMode.Text = "Gesture Mode";
+            // 
+            // buttonGestureModeOff
+            // 
+            this.buttonGestureModeOff.Enabled = false;
+            this.buttonGestureModeOff.Location = new System.Drawing.Point(8, 57);
+            this.buttonGestureModeOff.Name = "buttonGestureModeOff";
+            this.buttonGestureModeOff.Size = new System.Drawing.Size(150, 32);
+            this.buttonGestureModeOff.TabIndex = 44;
+            this.buttonGestureModeOff.Text = "Stop Gesture Mode";
+            this.buttonGestureModeOff.UseVisualStyleBackColor = true;
+            this.buttonGestureModeOff.Click += new System.EventHandler(this.buttonGestureModeOff_Click);
+            // 
+            // buttonGestureModeOn
+            // 
+            this.buttonGestureModeOn.Location = new System.Drawing.Point(8, 19);
+            this.buttonGestureModeOn.Name = "buttonGestureModeOn";
+            this.buttonGestureModeOn.Size = new System.Drawing.Size(150, 32);
+            this.buttonGestureModeOn.TabIndex = 43;
+            this.buttonGestureModeOn.Text = "Start Gesture Mode";
+            this.buttonGestureModeOn.UseVisualStyleBackColor = true;
+            this.buttonGestureModeOn.Click += new System.EventHandler(this.buttonGestureModeOn_Click);
+            // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(869, 609);
+            this.ClientSize = new System.Drawing.Size(869, 685);
+            this.Controls.Add(this.groupBoxGestureMode);
             this.Controls.Add(this.groupBoxMouseTrack);
             this.Controls.Add(this.groupBoxOpentrack);
             this.Controls.Add(this.trackBarDrift);
@@ -997,6 +1035,7 @@
             this.groupBoxOpentrack.PerformLayout();
             this.groupBoxMouseTrack.ResumeLayout(false);
             this.groupBoxMouseTrack.PerformLayout();
+            this.groupBoxGestureMode.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1083,6 +1122,9 @@
         private System.Windows.Forms.Label labelFightDriftRoll;
         private System.Windows.Forms.Button buttonFightDriftRollMinus;
         private System.Windows.Forms.Button buttonFightDriftRollPlus;
+        private System.Windows.Forms.GroupBox groupBoxGestureMode;
+        private System.Windows.Forms.Button buttonGestureModeOff;
+        private System.Windows.Forms.Button buttonGestureModeOn;
     }
 }
 

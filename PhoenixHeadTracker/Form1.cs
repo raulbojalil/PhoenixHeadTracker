@@ -95,6 +95,7 @@ namespace PhoenixHeadTracker
 
         private bool isMouseTrack = false;    // flag to indicate whether mouse tracking is enabled
         private bool isOpenTrack = false;     // flag to indicate whether open tracking is enabled
+        private bool isGestureModeEnabled = false;
 
         // These variables are used to calculate changes in mouse movement
         private double previousX = 0;
@@ -191,17 +192,22 @@ namespace PhoenixHeadTracker
 
         bool isMouseLeftDown = false;
         bool isMouseRightDown = false;
+        float previousYawValue = 0f;
+        float cooldownTimer = 0f;
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            if (cooldownTimer > 0)
+            {
+                cooldownTimer -= timer1.Interval;
+            }
+
             // Get the Euler angles from an external library and store them in an array
             ptr = GetEuler(); // Assume that GetEuler() returns a pointer to a float array
             arr = new float[3];
 
             // Copy the values from the pointer into the array
             Marshal.Copy(ptr, arr, 0, 3);
-
-
 
             // Calculate the x, y, and roll values based on screen size and user-defined speeds
             x = (arr[2] * (screenWidthScale * screenWidthScale) / trackBarYawSpeed.Value);
@@ -259,7 +265,7 @@ namespace PhoenixHeadTracker
 
 
                 // Check if the track is open
-                if (isOpenTrack == true)
+                if (isOpenTrack)
                 {
                     // Update x, y, and roll rotation distances based on the previous values
                     double tempX = (xRot - arr[2]);
@@ -337,10 +343,44 @@ namespace PhoenixHeadTracker
                     }
                 }
 
-                // Check if mouse tracking is enabled
-                if (isMouseTrack == true)
+                if (isGestureModeEnabled)
                 {
-                    if (arr[0] > 10.0f)
+                    var diffYawValue = Math.Abs(arr[2] - previousYawValue);
+
+                    if (cooldownTimer <= 0)
+                    {
+                        if (diffYawValue > 1.7 && !isMouseLeftDown)
+                        {
+                            isMouseLeftDown = true;
+                            input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTDOWN;
+
+                            IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
+                            Marshal.StructureToPtr(input, lParam, false);
+                            SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
+                            Marshal.FreeHGlobal(lParam);
+                            System.Threading.Thread.Sleep(mouseDelayFilter);
+                        }
+                        else if (isMouseLeftDown)
+                        {
+                            isMouseLeftDown = false;
+                            cooldownTimer = 20;
+                            input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTUP;
+
+                            IntPtr lParam = Marshal.AllocHGlobal(Marshal.SizeOf(input));
+                            Marshal.StructureToPtr(input, lParam, false);
+                            SendMessage(hWnd, WM_INPUT, IntPtr.Zero, lParam);
+                            Marshal.FreeHGlobal(lParam);
+                            System.Threading.Thread.Sleep(mouseDelayFilter);
+                        }
+                    }
+
+                    previousYawValue = arr[2];
+                }
+
+                // Check if mouse tracking is enabled
+                if (isMouseTrack)
+                {
+                    if (arr[0] > 14.0f)
                     {
                         isMouseLeftDown = true;
                         input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -364,7 +404,7 @@ namespace PhoenixHeadTracker
                         System.Threading.Thread.Sleep(mouseDelayFilter);
 
                     }
-                    if (arr[0] < -10.0f)
+                    if (arr[0] < -14.0f)
                     {
                         isMouseRightDown = true;
                         input.inputUnion.mouseInput.dwFlags = MOUSEEVENTF_RIGHTDOWN;
@@ -415,6 +455,7 @@ namespace PhoenixHeadTracker
                             System.Threading.Thread.Sleep(mouseDelayFilter);
                         }
                     }
+
                 }
 
             }
@@ -536,6 +577,7 @@ namespace PhoenixHeadTracker
             // Set some initial variables to false, and enable certain UI elements
             isMouseTrack = false; // Tracks whether the mouse is being used to control a camera
             isOpenTrack = false; // Tracks whether an external program is being used to control a camera
+            isGestureModeEnabled = false;
             buttonReset.Enabled = true; // Enable a button to reset camera values
             trackBarYawSpeed.Enabled = true; // Enable a slider to control camera yaw speed
             trackBarPitchSpeed.Enabled = true; // Enable a slider to control camera pitch speed
@@ -544,6 +586,7 @@ namespace PhoenixHeadTracker
             labelDriftFilter.Enabled = true; // Enable a label for the camera drift slider
             groupBoxOpentrack.Enabled = true; // Enable a group box for controlling OpenTrack settings
             groupBoxMouseTrack.Enabled = true; // Enable a group box for controlling mouse tracking settings
+            groupBoxGestureMode.Enabled = true;
 
             // Reset any camera values that need to be reset
             ResetValues();
@@ -578,11 +621,13 @@ namespace PhoenixHeadTracker
             // Set up the OpenTrack connection
             isMouseTrack = false;           // Disable mouse tracking
             isOpenTrack = true;             // Enable OpenTrack connection
+            isGestureModeEnabled = false;
             buttonStopOpentrack.Enabled = true;   // Enable "Stop" button
             buttonStartOpentrack.Enabled = false; // Disable "Start" button
             textBoxIPAddress.Enabled = false;     // Disable IP address text box
             textBoxPort.Enabled = false;          // Disable port text box
             groupBoxMouseTrack.Enabled = false;   // Disable mouse tracking settings
+            groupBoxGestureMode.Enabled = false;
             trackBarYawSpeed.Enabled = false;     // Disable yaw speed adjustment
             trackBarPitchSpeed.Enabled = false;   // Disable pitch speed adjustment
             trackBarRollSpeed.Enabled = false;    // Disable roll speed adjustment
@@ -619,11 +664,13 @@ namespace PhoenixHeadTracker
             // Set initial values for variables and controls
             isMouseTrack = false;               // Set mouse tracking to false
             isOpenTrack = false;                // Set open tracking to false
+            isGestureModeEnabled = false;
             buttonStopOpentrack.Enabled = false;// Disable the "Stop" button for open tracking
             buttonStartOpentrack.Enabled = true;// Enable the "Start" button for open tracking
             textBoxIPAddress.Enabled = true;    // Enable IP address textbox
             textBoxPort.Enabled = true;         // Enable port number textbox
             groupBoxMouseTrack.Enabled = true;  // Enable mouse tracking group box
+            groupBoxGestureMode.Enabled = true;
             trackBarYawSpeed.Enabled = true;    // Enable yaw speed track bar
             trackBarPitchSpeed.Enabled = true;  // Enable pitch speed track bar
             trackBarRollSpeed.Enabled = true;   // Enable roll speed track bar
@@ -664,7 +711,7 @@ namespace PhoenixHeadTracker
                     try
                     {
                         // Check if mouse tracking is enabled
-                        if (isMouseTrack)
+                        if (isMouseTrack || isGestureModeEnabled)
                         {
                             // Send the raw input as mouse input
                             if (SendInput(1, new INPUT[] { raw }, Marshal.SizeOf(raw)) == 0)
@@ -724,12 +771,15 @@ namespace PhoenixHeadTracker
             // Enable mouse tracking and disable OpenTrack controls when starting to track
             isMouseTrack = true; // Set flag to indicate mouse tracking is active
             isOpenTrack = false; // Set flag to indicate OpenTrack is not active
+            isGestureModeEnabled = false;
             buttonMouseTrackOn.Enabled = false; // Disable button to start mouse tracking
             buttonMouseTrackOff.Enabled = true; // Enable button to stop mouse tracking
+    
             trackBarYawSpeed.Enabled = false; // Disable control to adjust yaw speed
             trackBarPitchSpeed.Enabled = false; // Disable control to adjust pitch speed
             trackBarRollSpeed.Enabled = false; // Disable control to adjust roll speed
             groupBoxOpentrack.Enabled = false; // Disable group box containing OpenTrack controls
+            groupBoxGestureMode.Enabled = false;
 
             screenWidthScale = int.Parse(textBoxYawTrackValue.Text);
             screenHeightScale= int.Parse(textBoxPitchTrackValue.Text);
@@ -744,12 +794,14 @@ namespace PhoenixHeadTracker
         {
             isMouseTrack = false;    // This sets the value of the isMouseTrack variable to false
             isOpenTrack = false;     // This sets the value of the isOpenTrack variable to false
+            isGestureModeEnabled = false;
             buttonMouseTrackOn.Enabled = true;   // This enables the buttonMouseTrackOn button
             buttonMouseTrackOff.Enabled = false; // This disables the buttonMouseTrackOff button
             trackBarYawSpeed.Enabled = true;     // This enables the trackBarYawSpeed slider
             trackBarPitchSpeed.Enabled = true;   // This enables the trackBarPitchSpeed slider
             trackBarRollSpeed.Enabled = true;    // This enables the trackBarRollSpeed slider
             groupBoxOpentrack.Enabled = true;    // This enables the groupBoxOpentrack group box
+            groupBoxGestureMode.Enabled = true;
 
             textBoxYawTrackValue.Enabled = true;
             textBoxPitchTrackValue.Enabled = true;
@@ -880,6 +932,48 @@ namespace PhoenixHeadTracker
         {
             FightDriftRoll += 1;
             labelFightDriftRoll.Text = string.Format("Opentrack Fight Drift {0:0}", FightDriftRoll.ToString());
+        }
+
+        private void buttonGestureModeOn_Click(object sender, EventArgs e)
+        {
+            // Enable mouse tracking and disable OpenTrack controls when starting to track
+
+            isMouseTrack = false; // Set flag to indicate mouse tracking is active
+            isOpenTrack = false; // Set flag to indicate OpenTrack is not active
+            isGestureModeEnabled = true;
+            buttonGestureModeOn.Enabled = false; // Disable button to start gesture mode
+            buttonGestureModeOff.Enabled = true; // Enable button to stop gesture mode
+            trackBarYawSpeed.Enabled = false; // Disable control to adjust yaw speed
+            trackBarPitchSpeed.Enabled = false; // Disable control to adjust pitch speed
+            trackBarRollSpeed.Enabled = false; // Disable control to adjust roll speed
+            groupBoxOpentrack.Enabled = false; // Disable group box containing OpenTrack controls
+            groupBoxMouseTrack.Enabled = false;
+
+            screenWidthScale = int.Parse(textBoxYawTrackValue.Text);
+            screenHeightScale = int.Parse(textBoxPitchTrackValue.Text);
+            screenRollScale = int.Parse(textBoxRollTrackValue.Text);
+
+            textBoxYawTrackValue.Enabled = false;
+            textBoxPitchTrackValue.Enabled = false;
+            textBoxRollTrackValue.Enabled = false;
+        }
+
+        private void buttonGestureModeOff_Click(object sender, EventArgs e)
+        {
+            isMouseTrack = false;    // This sets the value of the isMouseTrack variable to false
+            isOpenTrack = false;     // This sets the value of the isOpenTrack variable to false
+            isGestureModeEnabled = false;
+            buttonGestureModeOn.Enabled = true;   // This enables the gesture mode button
+            buttonGestureModeOff.Enabled = false; // This disables the gesture mode button
+            trackBarYawSpeed.Enabled = true;     // This enables the trackBarYawSpeed slider
+            trackBarPitchSpeed.Enabled = true;   // This enables the trackBarPitchSpeed slider
+            trackBarRollSpeed.Enabled = true;    // This enables the trackBarRollSpeed slider
+            groupBoxOpentrack.Enabled = true;    // This enables the groupBoxOpentrack group box
+            groupBoxMouseTrack.Enabled = true;
+
+            textBoxYawTrackValue.Enabled = true;
+            textBoxPitchTrackValue.Enabled = true;
+            textBoxRollTrackValue.Enabled = true;
         }
     }
 
